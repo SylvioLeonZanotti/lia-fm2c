@@ -1,0 +1,284 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@keyframes node-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+
+@keyframes connector-grow {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+
+@keyframes dot-flow {
+  0%   { top: -6px;   opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { top: calc(100% + 6px); opacity: 0; }
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(0.9); opacity: 1; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+.node-enter {
+  opacity: 0;
+  animation: node-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.connector-grow {
+  transform-origin: top;
+  animation: connector-grow 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.dot-flow {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  animation: dot-flow 0.9s ease-in-out infinite;
+}
+
+/* ── UI entrance animations ──────────────────────────────────── */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.94) translateY(14px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+@keyframes modal-out {
+  from { opacity: 1; transform: scale(1)    translateY(0); }
+  to   { opacity: 0; transform: scale(0.94) translateY(14px); }
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes message-pop {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+@keyframes page-fade {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.backdrop-enter { animation: fade-in   0.2s  ease forwards; }
+.backdrop-exit  { animation: fade-out  0.18s ease forwards; }
+.modal-enter    { animation: modal-in  0.24s cubic-bezier(0.34, 1.4, 0.64, 1) forwards; }
+.modal-exit     { animation: modal-out 0.18s ease forwards; }
+.slide-down     { animation: slide-down 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.message-enter  { opacity: 0; animation: message-pop 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.page-fade      { opacity: 0; animation: page-fade   0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+.cursor { animation: blink 0.7s ease-in-out infinite; }
+
+/* ── Lia Intro (Apple-style) ─────────────────────────────────── */
+
+@keyframes li-ring-pulse {
+  0%   { transform: scale(1);   opacity: 0.55; }
+  100% { transform: scale(1.75); opacity: 0; }
+}
+
+/* Overlay */
+.li-root {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+  background: radial-gradient(
+    ellipse 80% 60% at 50% 38%,
+    #163c3c 0%,
+    #0d2626 45%,
+    #060f0f 100%
+  );
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.li-root--in  { opacity: 1; }
+.li-root--out {
+  opacity: 0;
+  transform: scale(0.97);
+  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Avatar em círculo com anéis */
+.li-circle {
+  position: relative;
+  /* tamanho igual ao círculo + espaço para os anéis expandirem */
+  width: 200px;
+  height: 200px;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 0.85s cubic-bezier(0.34, 1.2, 0.64, 1),
+              transform 0.85s cubic-bezier(0.34, 1.2, 0.64, 1);
+  transition-delay: 0.1s;
+}
+.li-circle--in {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Container interno: overflow:hidden + border-radius fazem o corte circular */
+.li-circle__img {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  overflow: hidden;               /* ← isso que corta em círculo */
+  border: 3px solid #14b8a6;
+  box-shadow: 0 0 0 5px rgba(20, 184, 166, 0.15),
+              0 0 40px rgba(20, 184, 166, 0.4),
+              0 0 80px rgba(20, 184, 166, 0.15);
+}
+.li-circle__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+
+/* Anéis de pulso — posicionados sobre o container mas não clipados */
+.li-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid rgba(20, 184, 166, 0.5);
+  pointer-events: none;
+}
+.li-circle--in .li-ring-1 {
+  animation: li-ring-pulse 2.2s cubic-bezier(0.2, 0.6, 0.4, 1) 0.6s infinite;
+}
+.li-circle--in .li-ring-2 {
+  animation: li-ring-pulse 2.2s cubic-bezier(0.2, 0.6, 0.4, 1) 1.4s infinite;
+}
+
+/* Bloco de texto */
+.li-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.li-heading {
+  margin: 0;
+  font-size: clamp(2.4rem, 6.5vw, 3.8rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #fff;
+  display: flex;
+  gap: 0.3em;
+  flex-wrap: wrap;
+  justify-content: center;
+  line-height: 1.05;
+}
+
+/* Cada palavra: blur-fade + rise (efeito Apple Vision Pro) */
+.li-word {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(10px);
+  transform: translateY(18px) scale(0.96);
+  transition: opacity  0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              filter   0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.li-word--in {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0) scale(1);
+}
+
+/* "Lia" — teal + glow */
+.li-word:last-child {
+  color: #2dd4bf;
+  text-shadow: 0 0 28px rgba(45, 212, 180, 0.7),
+               0 0 56px rgba(45, 212, 180, 0.35);
+}
+
+.li-sub {
+  margin: 0;
+  font-size: clamp(0.9rem, 2.4vw, 1.1rem);
+  font-weight: 500;
+  color: #5eead4;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  opacity: 0;
+  filter: blur(6px);
+  transform: translateY(12px);
+  transition: opacity 0.5s ease, filter 0.5s ease, transform 0.5s ease;
+}
+.li-sub--in {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0);
+}
+
+/* Dica "pular" */
+.li-skip {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.2);
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.4s ease 2s;
+}
+.li-skip--in { opacity: 1; }
